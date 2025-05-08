@@ -1,0 +1,59 @@
+/* Leave as is */
+.previewStyles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(var(--target-width) * 1px);
+  height: calc(var(--target-height) * 1px);
+  transform-origin: top left;
+  overflow: hidden;
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.previewStyles .container {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: calc(var(--original-width) * 1px);
+  height: calc(var(--original-height) * 1px);
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(var(--scale-factor));
+  transform-origin: center;
+}
+
+.previewStyles[data-fit-full="true"] .container {
+  --scale-factor: calc(1 * max(calc(var(--target-width) / var(--original-width)), calc(var(--target-height) / var(--original-height))));
+}
+
+.previewStyles[data-fit-full="false"] .container {
+  --scale-factor: calc(var(--target-width) / var(--original-width));
+}
+
+.container {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #ffffff;
+}
+
+canvas {
+  border: none;
+  background-color: #ffffff;
+}
+
+/* Add any other necessary styles here... */
+img,
+div {
+  -webkit-user-drag: none; /* Disable dragging in Safari */
+}
