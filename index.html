@@ -48,23 +48,23 @@
         Select the same faces and test ur knowledge by remembering where they are.</div>
 
       <!-- Refresh Button -->
-      <img id="refreshBtn" src="./assets/refreshButton.webp"
+      <img id="refreshBtn" src="./assets/images/refreshButton.webp"
         style="position: absolute; left: -90px; top: 50px; cursor: pointer; z-index: 4001; display: none" width="60"
         height="60" />
 
       <!-- Edit Mode Button -->
-      <img id="editModeBtn" src="./assets/editButton.webp"
+      <img id="editModeBtn" src="./assets/images/editButton.webp"
         style="position: absolute; left: -90px; top: 150px; cursor: pointer; z-index: 4001" width="60" height="60" />
 
       <!--  Settings Button -->
-      <img id="settingsBtn" src="./assets/settingsButton.webp"
+      <img id="settingsBtn" src="./assets/images/settingsButton.webp"
         style="position: absolute; left: -90px; top: 250px; cursor: pointer; z-index: 4001; display: none" width="60"
         height="60" />
 
 
 
       <!--  Save Button -->
-      <img id="saveBtn" src="./assets/saveButton.webp"
+      <img id="saveBtn" src="./assets/images/saveButton.webp"
         style="position: absolute; left: -90px; top: 550px; cursor: pointer; z-index: 4001; display: none" width="60"
         height="60" />
 
@@ -83,84 +83,16 @@
           style="position: absolute; right: -6px; bottom: -6px; width: 14px; height: 14px; cursor: nwse-resize; visibility: hidden; border-radius: 100%; background-color: white; border: 1px solid red; z-index: 4001">
         </div>
 
-        <img id="btn" src="./assets/infoDark.webp"
+        <img id="btn" src="./assets/images/infoDark.webp"
           style="cursor: pointer; border: 1px solid transparent; width: 60px; height: 60px" />
       </div>
 
       <!-- Items -->
       <div id="memoryQuest" class="previewStyles" style="margin: 50px;">
         <div class="container">
-          <div class="pair-options" id="pairSelector">
-            <div class="pair-option" data-value="2">
-              <img src="./assets/two.webp" alt="2 Pairs">
-            </div>
-            <div class="pair-option" data-value="3">
-              <img src="./assets/three.webp" alt="3 Pairs">
-            </div>
-            <div class="pair-option" data-value="4">
-              <img src="./assets/four.webp" alt="4 Pairs">
-            </div>
-            <div class="pair-option" data-value="5">
-              <img src="./assets/five.webp" alt="5 Pairs">
-            </div>
-          </div>
           <div id="gameBoard" style="position: relative; width: 800px; height: 600px;"></div>
-
-
-
-
-          <!-- Card Fronts
-          <img id="cardFront1" style="position: absolute; left: 130px; top: 100px; cursor: not-allowed;" width="200"
-            height="200">
-
-          <img id="cardFront2" style="position: absolute; left: 412px; top: 100px; cursor: not-allowed;" width="200"
-            height="200">
-
-          <img id="cardFront3" style="position: absolute; left: 700px; top: 100px; cursor: not-allowed;" width="200"
-            height="200">
-
-          <img id="cardFront4" style="position: absolute; left: 275px; top: 400px; cursor: not-allowed;" width="200"
-            height="200">
-
-          <img id="cardFront5" style="position: absolute; left: 550px; top: 400px; cursor: not-allowed;" width="200"
-            height="200">
-
-          <img id="cardFront6" style="position: absolute; left: 130px; top: 700px; cursor: not-allowed;" width="200"
-            height="200">
-
-          <img id="cardFront7" style="position: absolute; left: 412px; top: 700px; cursor: not-allowed;" width="200"
-            height="200">
-
-          <img id="cardFront8" style="position: absolute; left: 700px; top: 700px; cursor: not-allowed;" width="200"
-            height="200">
-
-          <!-- Card Backs -->
-          <!-- <img id="card1" src="./assets/cardBack.webp"
-            style="position: absolute; left: 130px; top: 100px; cursor: pointer;" width="200" height="200">
-
-          <img id="card2" src="./assets/cardBack.webp"
-            style="position: absolute; left: 412px; top: 100px; cursor: pointer;" width="200" height="200">
-
-          <img id="card3" src="./assets/cardBack.webp"
-            style="position: absolute; left: 700px; top: 100px; cursor: pointer;" width="200" height="200">
-
-          <img id="card4" src="./assets/cardBack.webp"
-            style="position: absolute; left: 275px; top: 400px; cursor: pointer;" width="200" height="200">
-
-          <img id="card5" src="./assets/cardBack.webp"
-            style="position: absolute; left: 550px; top: 400px; cursor: pointer;" width="200" height="200">
-
-          <img id="card6" src="./assets/cardBack.webp"
-            style="position: absolute; left: 130px; top: 700px; cursor: pointer;" width="200" height="200">
-
-          <img id="card7" src="./assets/cardBack.webp"
-            style="position: absolute; left: 412px; top: 700px; cursor: pointer;" width="200" height="200">
-
-          <img id="card8" src="./assets/cardBack.webp"
-            style="position: absolute; left: 700px; top: 700px; cursor: pointer;" width="200" height="200"> --> -->
-
           <!-- Audios -->
-          <audio preload="auto" id="correctSound" src="assets/audio/correct.mp3"
+          <!-- <audio preload="auto" id="correctSound" src="assets/audio/correct.mp3"
             style="display: none; position: absolute;"></audio>
 
           <audio preload="auto" id="flipSound" src="assets/audio/flip.mp3"
@@ -173,9 +105,8 @@
             style="display: none; position: absolute;"></audio>
 
           <audio id="clickSound" preload="auto" src="assets/audio/click.mp3"
-            style="display: none; position: absolute;"></audio>
+            style="display: none; position: absolute;"></audio> -->
         </div>
-
       </div>
 
       <!-- Settings Screen -->
@@ -191,6 +122,46 @@
             <input type="file" id="bgImgInput" accept="image/*" class="image-upload-input" />
           </div>
         </div>
+
+        <!-- Pair Section -->
+        <div class="pair-options" id="pairSelector">
+          <div class="pair-option" data-value="2">
+            <img src="./assets/two.webp" alt="2 Pairs">
+          </div>
+          <div class="pair-option" data-value="3">
+            <img src="./assets/three.webp" alt="3 Pairs">
+          </div>
+          <div class="pair-option" data-value="4">
+            <img src="./assets/four.webp" alt="4 Pairs">
+          </div>
+          <div class="pair-option" data-value="5">
+            <img src="./assets/five.webp" alt="5 Pairs">
+          </div>
+        </div>
+
+        <!-- Card Appearance Section -->
+        <div class="settings-section">
+          <h1 class="settings-section-title">Card Appearance</h1>
+
+          <div class="image-upload-container">
+            <img id="cardBackImage" src="./assets/cardBack.webp" class="image-upload-preview" />
+            <label for="cardBackImgInput" class="custom-button">Upload Back Image</label>
+            <input type="file" id="cardBackImgInput" accept="image/*" class="image-upload-input" />
+          </div>
+          <h1 class="settings-section-title" style="margin-top: 30px;">Edit Card Face Pairs</h1>
+
+          <div id="faceCardSelector" style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px;"></div>
+
+          <div class="image-upload-container" style="margin-top: 20px;">
+            <img id="selectedFaceImagePreview" src="" class="image-upload-preview"
+              style="width: 80px; height: 120px; border: 1px solid #aaa;" />
+            <label for="cardFaceImgInput" class="custom-button" style="margin-left: 10px;">Upload New Face Image</label>
+            <input type="file" id="cardFaceImgInput" accept="image/*" class="image-upload-input" />
+          </div>
+
+        </div>
+
+
 
         <!-- Tooltip Section -->
         <div class="settings-section">
@@ -212,6 +183,7 @@
             </div>
           </div>
         </div>
+
 
         <!-- Sound Effects Section -->
         <div class="settings-section">
@@ -250,7 +222,7 @@
           <div class="sound-effect-row">
             <h2 class="sound-effect-label">Delete</h2>
             <div class="sound-effect-controls">
-              <audio id="audioElement4" src="./assets/audio/delete.mp3" controls class="sound-effect-audio"></audio>
+              <audio id="audioElement4" src="./assets/audios/delete.mp3" controls class="sound-effect-audio"></audio>
               <label for="audioInput4" class="custom-button" style="margin-left: 52%; margin-top: 10px">Upload
                 Sound</label>
               <input type="file" id="audioInput4" accept="audio/*" style="display: none" />
@@ -344,9 +316,9 @@
       <!-- Audios -->
       <audio preload="auto" id="collectSound" src="assets/audio/correct.mp3"></audio>
       <audio preload="auto" id="winSound" src="assets/audio/win.mp3"></audio>
-      <audio preload="auto" id="wrongSound" src="./assets/audio/wrong.mp3"></audio>
+      <audio preload="auto" id="wrongSound" src="./assets/audios/wrong.mp3"></audio>
       <audio preload="auto" id="clickSound" src="assets/audio/click.mp3"></audio>
-      <audio preload="auto" id="deleteSound" src="./assets/audio/delete.mp3"></audio>
+      <audio preload="auto" id="deleteSound" src="./assets/audios/delete.mp3"></audio>
     </div>
   </div>
 

@@ -302,11 +302,12 @@ let isPlaying = true;
 let allowClick = true;
 let btnClicked = false;
 
-const cardBackUrl = "cardBack.webp";
+const cardBackUrl = "./assets/cardBack.webp";
 const allTypes = ["spade", "diamond", "clover", "heart", "star"]; // Add more if needed
 
 const urlParams = new URLSearchParams(window.location.search);
 const snapshot = urlParams.get("snapshot");
+let cardBackImgUrl = "./assets/cardBack.webp"; // Fallback image path
 
 const cardFront1Url = urlParams.get("cardfront1");
 const cardFront2Url = urlParams.get("cardfront2");
@@ -319,6 +320,7 @@ const cardImageMap = {
   heart: cardFront3Url,
   diamond: cardFront4Url,
 };
+let cardFaceMap = {};
 
 const options = document.querySelectorAll(".pair-option");
 
@@ -329,8 +331,6 @@ options.forEach((option) => {
     option.classList.add("selected");
 
     const selectedValue = option.getAttribute("data-value");
-    console.log("Selected Pairs:", selectedValue);
-    pairSelector.style.visibility = "hidden";
     const numPairs = parseInt(selectedValue);
     const totalCards = numPairs * 2;
     let allPositions;
@@ -348,8 +348,6 @@ options.forEach((option) => {
     }
 
     const positions = allPositions[numPairs];
-
-    // Shuffle the cards
     const selectedTypes = allTypes.slice(0, numPairs);
     let cardsDistribution = [...selectedTypes, ...selectedTypes];
     shuffle(cardsDistribution);
@@ -362,36 +360,61 @@ options.forEach((option) => {
 
     for (let i = 0; i < totalCards; i++) {
       const cardContainer = document.createElement("img");
-      cardContainer.src = `assets/${cardBackUrl}`;
+
+      // ✅ Ensure cardBackImgUrl is defined globally or before this block
+      cardContainer.src = cardBackImgUrl;
+      cardContainer.dataset.backImage = cardBackImgUrl;
+
+      // Type/index for matching logic
       cardContainer.dataset.type = cardsDistribution[i];
       cardContainer.dataset.index = i;
+
+      // Position cards based on JSON layout
       cardContainer.style.position = "absolute";
       cardContainer.style.top = positions[i].top;
       cardContainer.style.left = positions[i].left;
+
+      // Set size based on pair count
       if (numPairs === 2) {
         cardContainer.style.width = "140px";
         cardContainer.style.height = "250px";
       } else if (numPairs === 3) {
         cardContainer.style.width = "120px";
         cardContainer.style.height = "200px";
+      } else {
+        cardContainer.style.width = "100px";
+        cardContainer.style.height = "180px";
       }
 
       cardContainer.style.cursor = "pointer";
 
+      // Click logic
       cardContainer.addEventListener("click", () => {
         const index = parseInt(cardContainer.dataset.index);
-        if (flippedCard1 === null && flippedCard2 === null) handleClick(cardContainer, index);
-        else handleClickWithThrottle(cardContainer, index);
+        if (flippedCard1 === null && flippedCard2 === null) {
+          handleClick(cardContainer, index);
+        } else {
+          handleClickWithThrottle(cardContainer, index);
+        }
       });
-      console.log(selectedValue);
+
       cards.push(cardContainer);
       cardFronts.push(getCardFront(cardsDistribution[i]));
 
       gameBoard.appendChild(cardContainer);
     }
 
-    // Global cardsState
+    // ✅ Store state for flip logic
     cardsState = new Array(totalCards).fill(false);
+    cardFaceMap = {};
+    selectedTypes.forEach((type) => {
+      cardFaceMap[type] = getCardFront(type);
+    });
+
+    window.firstPairType = selectedTypes[0];
+
+    // Optional: Render face card options in UI
+    renderFaceCardSelector(Object.keys(cardFaceMap));
   });
 });
 
@@ -411,7 +434,7 @@ function getCardFront(type) {
 function handleClick(card, index) {
   if (!allowClick || cardsState[index]) return;
 
-  card.src = getCardFront(card.dataset.type);
+  card.src = card.dataset.faceImage || getCardFront(card.dataset.type);
   cardsState[index] = true;
 
   if (!flippedCard1) {
@@ -439,8 +462,8 @@ function checkMatch() {
     resetFlippedCards();
   } else {
     setTimeout(() => {
-      flippedCard1.card.src = `assets/${cardBackUrl}`;
-      flippedCard2.card.src = `assets/${cardBackUrl}`;
+      flippedCard1.card.src = flippedCard1.card.dataset.backImage;
+      flippedCard2.card.src = flippedCard2.card.dataset.backImage;
       cardsState[flippedCard1.index] = false;
       cardsState[flippedCard2.index] = false;
       resetFlippedCards();
@@ -452,6 +475,198 @@ function resetFlippedCards() {
   flippedCard1 = null;
   flippedCard2 = null;
 }
+
+const cardBackImgElement = document.getElementById("cardBackImage");
+const cardBackImgInput = document.getElementById("cardBackImgInput");
+
+cardBackImgInput.addEventListener("change", (e) => {
+  if (areChangesSaved.value) {
+    window.parent.postMessage(
+      {
+        type: "unsaved changes",
+        gameId: urlParams.get("gameid"),
+        url: window.location.origin,
+      },
+      parentUrl
+    );
+
+    areChangesSaved.value = false;
+    toggleSaveChangesBtn();
+  }
+
+  // Upload preview and store to <img id="cardBackImage">
+  handleSingleImageUpload(e, {
+    targetImg: cardBackImgElement,
+    newImg: cardBackImgElement,
+  });
+
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const newBackSrc = reader.result;
+
+    // Update the card back preview
+    cardBackImgElement.src = newBackSrc;
+
+    // Update the image URL for use when generating cards
+    cardBackImgUrl = newBackSrc;
+    document.getElementById("cardBackPreview").src = newBackSrc;
+
+    // Update all unflipped cards on the board
+    document.querySelectorAll("img[data-flipped='false']").forEach((card) => {
+      card.dataset.backImage = newBackSrc;
+      card.src = newBackSrc;
+    });
+  };
+  reader.readAsDataURL(file);
+  document.querySelector(".pair-option.selected")?.click();
+});
+
+async function loadInitialGridCards() {
+  const gameBoard = document.getElementById("gameBoard");
+  gameBoard.innerHTML = "";
+
+  const numPairs = 2;
+  const totalCards = numPairs * 2;
+
+  let allPositions;
+  try {
+    const res = await fetch("position.json");
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    allPositions = await res.json();
+  } catch (err) {
+    console.error("Failed to load positions:", err);
+    return;
+  }
+
+  const positions = allPositions[numPairs];
+  const selectedTypes = allTypes.slice(0, numPairs);
+  let cardsDistribution = [...selectedTypes, ...selectedTypes];
+  shuffle(cardsDistribution);
+
+  let cards = [];
+  let cardFrontUrls = [];
+
+  for (let i = 0; i < totalCards; i++) {
+    const type = cardsDistribution[i];
+    const card = document.createElement("img");
+
+    // Assign dataset values
+    card.dataset.type = type;
+    card.dataset.index = i;
+    card.dataset.faceImage = getCardFront(type);
+    card.dataset.backImage = cardBackUrl; // Make sure cardBackUrl is correctly assigned earlier
+    card.dataset.flipped = "false";
+
+    // Set the initial image source to the card back
+    card.src = card.dataset.backImage;
+
+    // Set card position and size
+    card.style.position = "absolute";
+    card.style.top = positions[i].top;
+    card.style.left = positions[i].left;
+    card.style.width = "140px";
+    card.style.height = "250px";
+    card.style.cursor = "pointer";
+
+    // Add click event
+    card.addEventListener("click", () => {
+      const index = parseInt(card.dataset.index);
+      if (flippedCard1 === null && flippedCard2 === null) {
+        handleClick(card, index);
+      } else {
+        handleClickWithThrottle(card, index);
+      }
+    });
+
+    // Add card to board and tracking arrays
+    gameBoard.appendChild(card);
+    cards.push(card);
+    cardFrontUrls.push(getCardFront(type)); // This is used if you want to access front images later
+  }
+
+  // Save custom faces for editing
+  cardFaceMap = {};
+  selectedTypes.forEach((type, i) => {
+    cardFaceMap[type] = getCardFront(type);
+  });
+  window.firstPairType = selectedTypes[0];
+  cardsState = new Array(totalCards).fill(false);
+  renderFaceCardSelector(Object.keys(cardFaceMap));
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadInitialGridCards();
+});
+
+function renderFaceCardSelector(types) {
+  const container = document.getElementById("faceCardSelector");
+  container.innerHTML = "";
+
+  types.forEach((type) => {
+    const card = document.createElement("div");
+    card.classList.add("face-card-thumbnail");
+    card.dataset.cardType = type;
+    card.style.cursor = "pointer";
+    card.style.border = "2px solid transparent";
+    card.style.padding = "5px";
+    card.style.transition = "all 0.3s";
+
+    const img = document.createElement("img");
+    img.src = cardFaceMap[type] || getCardFront(type);
+    img.style.width = "80px";
+    img.style.height = "120px";
+    img.style.borderRadius = "8px";
+    img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+
+    card.appendChild(img);
+    container.appendChild(card);
+
+    card.addEventListener("click", () => {
+      // Highlight the selected
+      container.querySelectorAll(".face-card-thumbnail").forEach((c) => (c.style.border = "2px solid transparent"));
+      card.style.border = "2px solid #007BFF";
+
+      selectedCardType = type;
+      document.getElementById("selectedFaceImagePreview").src = img.src;
+    });
+  });
+
+  // Default select the first
+  if (types.length > 0) {
+    container.querySelector(".face-card-thumbnail").click();
+  }
+}
+
+let selectedCardType = null;
+
+document.getElementById("cardFaceImgInput").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file || !selectedCardType) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const newSrc = reader.result;
+    document.getElementById("selectedFaceImagePreview").src = newSrc;
+
+    // Update all cards of selected type
+    document.querySelectorAll(`img[data-type='${selectedCardType}']`).forEach((card) => {
+      card.dataset.faceImage = newSrc;
+
+      if (cardsState?.[parseInt(card.dataset.index)]) {
+        card.src = newSrc;
+      }
+    });
+
+    cardFaceMap[selectedCardType] = newSrc;
+
+    // Update the selector thumbnail as well
+    renderFaceCardSelector(Object.keys(cardFaceMap));
+  };
+  reader.readAsDataURL(file);
+});
 
 // --------- //
 //  GENERAL  //
@@ -512,6 +727,11 @@ const settingsScreen = document.getElementById("settingsScreen");
 
 const bgImg = document.getElementById("bgImage");
 const bgImgInput = document.getElementById("bgImgInput");
+
+const cardBackImg = document.getElementById("cardBackImage");
+
+const cardFaceImgInput = document.getElementById("cardFaceImgInput");
+const cardFaceImg = document.getElementById("cardFaceImage");
 
 // ---------------- //
 //  ITEMS ADDITION  //
@@ -630,6 +850,35 @@ if (snapshot !== "true" && snapshot !== true) {
     handleSingleImageUpload(e, { targetImg: background, newImg: bgImg });
   });
 
+  cardFaceImgInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const newFaceSrc = reader.result;
+      cardFaceImg.src = newFaceSrc;
+
+      // Find the first card in the grid to get its type
+      const firstCard = document.querySelector(".memory-card, img[data-type]");
+      if (!firstCard) return;
+
+      const targetType = firstCard.dataset.type;
+
+      // Update all matching cards
+      document.querySelectorAll(`[data-type='${targetType}']`).forEach((card) => {
+        card.dataset.faceImage = newFaceSrc;
+        if (cardsState[parseInt(card.dataset.index)]) {
+          card.src = newFaceSrc; // if already flipped, reflect update
+        }
+      });
+
+      // Optional: store for future use
+      cardFaceMap[targetType] = newFaceSrc;
+    };
+
+    reader.readAsDataURL(file);
+  });
   settingsBtn.addEventListener("click", () => handleSettingsButtonClick({ cleanUp: false, clickSound, settingsScreen, saveScreen }));
   settingsCloseBtn.addEventListener("click", () => handleSettingsCloseButtonClick({ clickSound, settingsScreen }));
 
